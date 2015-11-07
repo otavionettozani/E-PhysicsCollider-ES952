@@ -39,12 +39,13 @@ float TS8_cos(float angle);
 
 //constructor of point
 Point pointMake(float x, float y);
+void e_pointMake(float x, float y, Point* p);
 
 //normalize a point
 void normalizePoint(Point* p);
 
 //distance between 2 points
-float pointsDistance(Point a, Point b);
+float pointsDistance(Point* a, Point* b);
 
 //rotate a vector
 Vector rotateVector(Vector a, float angle);

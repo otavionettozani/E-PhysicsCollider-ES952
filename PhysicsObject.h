@@ -62,7 +62,7 @@ char addPointToObject(PhysicsObject* object, Point point);
 char isObjectValid(PhysicsObject* object);
 
 //returns the position of point pt (originally in local reference) in a world reference
-Point worldPosition(Point* point, PhysicsObject* object);
+void worldPosition(Point* point, PhysicsObject* object, Point* result);
 
 //--------------------------Pre-Physics Geometry Calculations--------------------------//
 

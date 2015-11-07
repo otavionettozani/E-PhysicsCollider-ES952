@@ -14,8 +14,9 @@ State physicsResolution(PhysicsObject*a, PhysicsObject*b, CollisionPair pair){
 	//first we find the impulse in our collision
 	float impulse;
 
-	Point centerA = worldPosition(&a->rotationCenter, a);
-	Point centerB = worldPosition(&b->rotationCenter, b);
+	Point centerA, centerB;
+	worldPosition(&a->rotationCenter, a, &centerA);
+	worldPosition(&b->rotationCenter, b, &centerB);
 	Point RA = pointMake(pair.location.x-centerA.x, pair.location.y-centerA.y);
 	Point RB = pointMake(pair.location.x-centerB.x, pair.location.y-centerB.y);
 
@@ -43,9 +44,10 @@ State physicsResolution(PhysicsObject*a, PhysicsObject*b, CollisionPair pair){
 }
 
 char coarseCollision(PhysicsObject*a, PhysicsObject*b){
-	Point aCenter = worldPosition(&a->minimumCirclePosition, a);
-	Point bCenter = worldPosition(&b->minimumCirclePosition, b);
-	float centerDistance = pointsDistance(aCenter, bCenter);
+	Point aCenter, bCenter;
+	worldPosition(&a->minimumCirclePosition, a, &aCenter);
+	worldPosition(&b->minimumCirclePosition, b, &bCenter);
+	float centerDistance = pointsDistance(&aCenter, &bCenter);
 	float radiusSum = a->minimumCircleRadius + b->minimumCircleRadius;
 	return centerDistance<radiusSum;
 }
@@ -82,9 +84,10 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 		 third vertex.*/
 		Anext = Acurrent==a->format.polygonInfo.count-1?0:Acurrent+1;
 		Abefore = Acurrent==0?a->format.polygonInfo.count-1:Acurrent-1;
-		Point PA1 = worldPosition(&a->format.polygonInfo.points[Abefore],a);
-		Point PA2 = worldPosition(&a->format.polygonInfo.points[Acurrent],a);
-		Point PA3 = worldPosition(&a->format.polygonInfo.points[Anext],a);
+		Point PA1, PA2, PA3;
+		worldPosition(&a->format.polygonInfo.points[Abefore],a, &PA1);
+		worldPosition(&a->format.polygonInfo.points[Acurrent],a, &PA2);
+		worldPosition(&a->format.polygonInfo.points[Anext],a, &PA3);
 		Vector A1 = pointMake(PA2.x-PA1.x, PA2.y-PA1.y);
 		Vector A2 = pointMake(PA3.x-PA2.x, PA3.y-PA2.y);
 
@@ -96,8 +99,9 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 			 If both edges of A hitted more than one edge of B, we will keep the highest
 			 depth*/
 			Bnext = Bcurrent==b->format.polygonInfo.count-1?0:Bcurrent+1;
-			Point PB1 = worldPosition(&b->format.polygonInfo.points[Bcurrent], b);
-			Point PB2 = worldPosition(&b->format.polygonInfo.points[Bnext], b);
+			Point PB1, PB2;
+			worldPosition(&b->format.polygonInfo.points[Bcurrent], b, &PB1);
+			worldPosition(&b->format.polygonInfo.points[Bnext], b, &PB2);
 			Vector B = pointMake(PB2.x-PB1.x, PB2.y-PB1.y);
 			Vector I1 = pointMake(PB1.x-PA1.x, PB1.y-PA1.y);
 			Vector I2 = pointMake(PB1.x-PA2.x, PB1.y-PA2.y);
@@ -155,9 +159,10 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 		 third vertex.*/
 		Anext = Acurrent==b->format.polygonInfo.count-1?0:Acurrent+1;
 		Abefore = Acurrent==0?b->format.polygonInfo.count-1:Acurrent-1;
-		Point PA1 = worldPosition(&b->format.polygonInfo.points[Abefore],b);
-		Point PA2 = worldPosition(&b->format.polygonInfo.points[Acurrent],b);
-		Point PA3 = worldPosition(&b->format.polygonInfo.points[Anext],b);
+		Point PA1, PA2, PA3;
+		worldPosition(&b->format.polygonInfo.points[Abefore],b, &PA1);
+		worldPosition(&b->format.polygonInfo.points[Acurrent],b, &PA2);
+		worldPosition(&b->format.polygonInfo.points[Anext],b, &PA3);
 		Vector A1 = pointMake(PA2.x-PA1.x, PA2.y-PA1.y);
 		Vector A2 = pointMake(PA3.x-PA2.x, PA3.y-PA2.y);
 
@@ -169,8 +174,9 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 			 If both edges of B hitted more than one edge of A, we will keep the highest
 			 depth*/
 			Bnext = Bcurrent==a->format.polygonInfo.count-1?0:Bcurrent+1;
-			Point PB1 = worldPosition(&a->format.polygonInfo.points[Bcurrent], a);
-			Point PB2 = worldPosition(&a->format.polygonInfo.points[Bnext], a);
+			Point PB1, PB2;
+			worldPosition(&a->format.polygonInfo.points[Bcurrent], a, &PB1);
+			worldPosition(&a->format.polygonInfo.points[Bnext], a, &PB2);
 			Vector B = pointMake(PB2.x-PB1.x, PB2.y-PB1.y);
 			Vector I1 = pointMake(PB1.x-PA1.x, PB1.y-PA1.y);
 			Vector I2 = pointMake(PB1.x-PA2.x, PB1.y-PA2.y);
@@ -228,9 +234,10 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 		 third vertex.*/
 		Anext = Acurrent==a->format.polygonInfo.count-1?0:Acurrent+1;
 		Abefore = Acurrent==0?a->format.polygonInfo.count-1:Acurrent-1;
-		Point PA1 = worldPosition(&a->format.polygonInfo.points[Abefore],a);
-		Point PA2 = worldPosition(&a->format.polygonInfo.points[Acurrent],a);
-		Point PA3 = worldPosition(&a->format.polygonInfo.points[Anext],a);
+		Point PA1, PA2, PA3;
+		worldPosition(&a->format.polygonInfo.points[Abefore],a, &PA1);
+		worldPosition(&a->format.polygonInfo.points[Acurrent],a, &PA2);
+		worldPosition(&a->format.polygonInfo.points[Anext],a, &PA3);
 		Vector A12 = pointMake(PA2.x-PA1.x, PA2.y-PA1.y);
 		Vector A23 = pointMake(PA3.x-PA2.x, PA3.y-PA2.y);
 
@@ -240,9 +247,10 @@ State collideObjects(PhysicsObject* a, PhysicsObject* b){
 			/*for each pair of edge of B, we will find if any of the edges are hitted as shown above*/
 			Bnext = Bcurrent==b->format.polygonInfo.count-1?0:Bcurrent+1;
 			Bbefore = Bcurrent==0?b->format.polygonInfo.count-1:Bcurrent-1;
-			Point PB1 = worldPosition(&b->format.polygonInfo.points[Bbefore], b);
-			Point PB2 = worldPosition(&b->format.polygonInfo.points[Bcurrent], b);
-			Point PB3 = worldPosition(&b->format.polygonInfo.points[Bnext], b);
+			Point PB1, PB2, PB3;
+			worldPosition(&b->format.polygonInfo.points[Bbefore], b, &PB1);
+			worldPosition(&b->format.polygonInfo.points[Bcurrent], b, &PB2);
+			worldPosition(&b->format.polygonInfo.points[Bnext], b, &PB3);
 			Vector B12 = pointMake(PB2.x-PB1.x, PB2.y-PB1.y);
 			Vector B23 = pointMake(PB3.x-PB2.x, PB3.y-PB2.y);
 			Vector IA12B23 = pointMake(PB2.x-PA1.x, PB2.y-PA1.y);

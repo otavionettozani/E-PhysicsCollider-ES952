@@ -12,7 +12,7 @@
 float BS_sqrt(float value){
 	float base =value<1?value:0, top=value<1?1:value;
 	float answer = value/2;
-	
+
 	while (answer*answer-value<-THRESHOLD || answer*answer-value>THRESHOLD) {
 		if(answer*answer<value){
 			base = answer;
@@ -21,7 +21,7 @@ float BS_sqrt(float value){
 		}
 		answer = (base+top)/2.;
 	}
-	
+
 	return answer;
 }
 
@@ -36,13 +36,13 @@ float TS9_sin(float angle){
 	while(angle>PI){
 		angle-=2*PI;
 	}
-	
+
 	float angle2 = angle*angle;
 	float angle3 = angle2*angle;
 	float angle5 = angle2*angle3;
 	float angle7 = angle2*angle5;
 	float angle9 = angle2*angle7;
-	
+
 	return angle - 0.166666*angle3 + 0.008333*angle5 - 0.000198*angle7 + 0.000002*angle9;
 }
 
@@ -53,12 +53,12 @@ float TS8_cos(float angle){
 	while(angle>PI){
 		angle-=2*PI;
 	}
-	
+
 	float angle2 = angle*angle;
 	float angle4 = angle2*angle2;
 	float angle6 = angle4*angle2;
 	float angle8 = angle4*angle4;
-	
+
 	return 1 - 0.5*angle2 + 0.041666*angle4 - 0.001388*angle6 + 0.000024*angle8;
 }
 
@@ -69,6 +69,11 @@ Point pointMake(float x, float y){
 	return a;
 }
 
+void e_pointMake(float x, float y, Point* p){
+    p->x = x;
+    p->y = y;
+}
+
 void normalizePoint(Point* p){
 	float length = BS_sqrt(p->x*p->x+p->y*p->y);
 	p->x /= length;
@@ -76,9 +81,9 @@ void normalizePoint(Point* p){
 	return;
 }
 
-float pointsDistance(Point a, Point b){
-	float deltax = a.x - b.x;
-	float deltay = a.y - b.y;
+float pointsDistance(Point* a, Point* b){
+	float deltax = a->x - b->x;
+	float deltay = a->y - b->y;
 	return BS_sqrt(deltax*deltax + deltay*deltay);
 }
 

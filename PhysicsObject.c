@@ -40,15 +40,15 @@ char isObjectValid(PhysicsObject* object){
 	return 0;
 }
 
-Point worldPosition(Point* point, PhysicsObject* object){
+void worldPosition(Point* point, PhysicsObject* object, Point* result){
 
 	float c1 = TS8_cos(object->rotation);
 	float s1 = TS9_sin(object->rotation);
 	float offsetx = object->rotationCenter.x*(1-c1)+object->rotationCenter.y*s1+object->position.x;
 	float offsety = object->rotationCenter.y*(1-c1)-object->rotationCenter.x*s1+object->position.y;
 
-	return pointMake(c1*point->x-s1*point->y+offsetx, s1*point->x+c1*point->y+offsety);
-
+    e_pointMake(c1*point->x-s1*point->y+offsetx, s1*point->x+c1*point->y+offsety,result);
+	return;
 }
 
 //--------------------------Pre-Physics Geometry Calculations--------------------------//
@@ -66,7 +66,7 @@ Point* copyPoints(int size, Point* points){
 
 //verifies if a point is inside a circle
 char isPointInsideCircle(Point point, float radius, Point position){
-	if(pointsDistance(point, position)<=radius){
+	if(pointsDistance(&point, &position)<=radius){
 		return 1;
 	}
 	return 0;
@@ -84,7 +84,7 @@ void minimumDisk(Point* P, Point* R, int sizeP, int sizeR, float* radius, Point*
 		}
 		if(sizeR==2){
 			*position = pointMake((R[0].x+R[1].x)/2., (R[0].y+R[1].y)/2.);
-			*radius = pointsDistance(R[0], R[1])/2.;
+			*radius = pointsDistance(&R[0], &R[1])/2.;
 			return;
 		}
 		if(sizeR==3){
@@ -99,7 +99,7 @@ void minimumDisk(Point* P, Point* R, int sizeP, int sizeR, float* radius, Point*
 
 			*position = pointMake(P1.x+w*PR.x, P1.y+w*PR.y);
 
-			*radius = pointsDistance(*position, R[0]);
+			*radius = pointsDistance(position, &R[0]);
 
 			return;
 		}

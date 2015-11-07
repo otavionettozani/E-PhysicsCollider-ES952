@@ -10,9 +10,12 @@ int main(void){
     PhysicsObject* objects = (PhysicsObject*)COMMADDRESS_OBJECTS;
     float* end = (float*)0x6400;
 
-    char a = coarseCollision(objects[0],objects[1]);
+    State a;
+
+    collideObjects(&objects[0],&objects[1], &a);
+
     end[0] = -1;
-    end[1] = a;
+    end[1] = a.deltaAngVel;
     end[2] = 0;
     end[3] = -1;
 

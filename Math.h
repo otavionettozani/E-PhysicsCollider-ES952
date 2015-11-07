@@ -48,5 +48,5 @@ void normalizePoint(Point* p);
 float pointsDistance(Point* a, Point* b);
 
 //rotate a vector
-Vector rotateVector(Vector a, float angle);
+void rotateVector(Vector* a, float angle, Vector* rotated);
 

@@ -31,8 +31,8 @@ typedef struct CP{
 
 
 /*returns the collision parameters variation for object A
- in a collision of both objects A and B, this method 
+ in a collision of both objects A and B, this method
  calculates both coarse and refined collision*/
-State collideObjects(PhysicsObject* a, PhysicsObject* b);
+void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state);
 
 void runPhysics(float timeStep);

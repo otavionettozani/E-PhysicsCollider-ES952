@@ -19,7 +19,7 @@
 typedef struct PT{
 	float x;
 	float y;
-}Point;
+}__attribute__((aligned(8))) Point;
 
 //only for a more readable code
 typedef Point Vector;

@@ -48,7 +48,7 @@ typedef struct PO{
 	float inverseInertia;
 	float angularVelocity;//radians/sec
 	Vector linearVelocity;
-}PhysicsObject;
+}__attribute__((aligned(8))) PhysicsObject;
 
 //--------------------------Building Objects--------------------------//
 
@@ -62,7 +62,7 @@ char addPointToObject(PhysicsObject* object, Point point);
 char isObjectValid(PhysicsObject* object);
 
 //returns the position of point pt (originally in local reference) in a world reference
-Point worldPosition(Point point, PhysicsObject object);
+Point worldPosition(Point* point, PhysicsObject* object);
 
 //--------------------------Pre-Physics Geometry Calculations--------------------------//
 

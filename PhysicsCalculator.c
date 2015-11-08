@@ -53,9 +53,9 @@ char coarseCollision(PhysicsObject*a, PhysicsObject*b){
 }
 
 void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
-	state->deltaAngVel = 0;
-	e_pointMake(0, 0, &state->deltaPosition);
-	e_pointMake(0, 0, &state->deltaVel);
+	//state->deltaAngVel = 0;
+	//e_pointMake(0, 0, &state->deltaPosition);
+	//e_pointMake(0, 0, &state->deltaVel);
 
 	CollisionPair pairs[2*PHYSICS_OBJECT_MAXIMUM_POINTS];
 	if(!coarseCollision(a, b)){

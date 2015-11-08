@@ -7,6 +7,35 @@
 
 #define RAM_SIZE (0x8000)
 
+#define MAX_ELEMENTS_PER_CORE (4)
+#define CORES (16)
+
+typedef struct PEng{
+    int count;
+    PhysicsObject objects[CORES*MAX_ELEMENTS_PER_CORE];
+} PhysicsEngine;
+
+
+char addObject(PhysicsEngine* engine, PhysicsObject object){
+    if(engine->count == MAX_ELEMENTS_PER_CORE*CORES){
+        return 0;
+    }
+    if(!isObjectValid(&object)){
+        return 0;
+    }
+    engine->objects[engine->count] = object;
+    engine->count++;
+    return 1;
+}
+
+char minimunCircles(PhysicsEngine* engine){
+    int i;
+    for(i=0; i<engine->count; i++){
+        calculateMinimumCircle(&engine->objects[i]);
+    }
+}
+
+
 void clearMemory(){
 
 	e_epiphany_t dev;
@@ -54,41 +83,52 @@ int main(){
 	e_open(&dev, 0,0,4,4);
 
 	e_reset_group(&dev);
-	//initialize physics objects
-	PhysicsObject objs[3];
-    objs[0].type = OBJECT_TYPE_POLYGON;
-	addPointToObject(&objs[0],pointMake(0,0));
-	addPointToObject(&objs[0],pointMake(2,-2));
-	addPointToObject(&objs[0],pointMake(4,0));
-	addPointToObject(&objs[0],pointMake(2,2));
+	//initialize physics objects and Physics Engine
+	PhysicsEngine engine;
+	engine.count = 0;
 
-	objs[0].rotationCenter = pointMake(2,0);
-	objs[0].position = pointMake(0,0);
-	objs[0].rotation = 0;
-	objs[0].inverseInertia = 1;
-	objs[0].inverseMass = 1;
-	objs[0].linearVelocity = pointMake(0,-1);
-	objs[0].angularVelocity = 0;
-	calculateMinimumCircle(&objs[0]);
+	PhysicsObject obj;
+    obj.type = OBJECT_TYPE_POLYGON;
+	addPointToObject(&obj,pointMake(0,0));
+	addPointToObject(&obj,pointMake(2,-2));
+	addPointToObject(&obj,pointMake(4,0));
+	addPointToObject(&obj,pointMake(2,2));
+
+	obj.rotationCenter = pointMake(2,0);
+	obj.position = pointMake(0,0);
+	obj.rotation = 0;
+	obj.inverseInertia = 1;
+	obj.inverseMass = 1;
+	obj.linearVelocity = pointMake(0,-1);
+	obj.angularVelocity = 0;
+
+	addObject(&engine,obj);
+
 	//-------
-    objs[1].type = OBJECT_TYPE_POLYGON;
-	addPointToObject(&objs[1],pointMake(0,-1));
-	addPointToObject(&objs[1],pointMake(2,-4));
-	addPointToObject(&objs[1],pointMake(4,-1));
+	PhysicsObject obj2;
+    obj2.type = OBJECT_TYPE_POLYGON;
+	addPointToObject(&obj2,pointMake(0,-1));
+	addPointToObject(&obj2,pointMake(2,-4));
+	addPointToObject(&obj2,pointMake(4,-1));
 
-	objs[1].rotationCenter = pointMake(2,-2);
-	objs[1].position = pointMake(0,0);
-	objs[1].rotation = 0;
-	objs[1].inverseInertia = 1;
-	objs[1].inverseMass = 1;
-	objs[1].linearVelocity = pointMake(0,0);
-	objs[1].angularVelocity = 0;
-	calculateMinimumCircle(&objs[1]);
+	obj2.rotationCenter = pointMake(2,-2);
+	obj2.position = pointMake(0,0);
+	obj2.rotation = 0;
+	obj2.inverseInertia = 1;
+	obj2.inverseMass = 1;
+	obj2.linearVelocity = pointMake(0,0);
+	obj2.angularVelocity = 0;
+
+	addObject(&engine,obj2);
+
+	//calculate minimun circles
+	minimunCircles(&engine);
 
     printf("%x\n",sizeof(PhysicsObject));
+
     for(i=0;i<4;i++){
         for(j=0;j<4;j++){
-            e_write(&dev,i,j,COMMADDRESS_OBJECTS,&objs[0],2*sizeof(PhysicsObject));
+            e_write(&dev,i,j,COMMADDRESS_OBJECTS,&engine.objects[0],2*sizeof(PhysicsObject));
             usleep(20000);
         }
     }
@@ -101,6 +141,10 @@ int main(){
         }
     }
 
+    gettimeofday(&initTime,NULL);
+    gettimeofday(&endTime, NULL);
+    long long int TotalTime =endTime.tv_sec*1000+endTime.tv_usec/1000-initTime.tv_usec/1000-initTime.tv_sec*1000;
+    printf("%lld\n", TotalTime);
 
     //-------------------------DUMP MEMORY -----------------------------
 	//read all memory
@@ -119,7 +163,6 @@ int main(){
 			}
 		}
 	}
-
 
 	fclose(file);
 	e_close(&dev);

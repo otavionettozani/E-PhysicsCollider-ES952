@@ -7,8 +7,6 @@
 
 #define RAM_SIZE (0x8000)
 
-#define MAX_ELEMENTS_PER_CORE (4)
-#define CORES (16)
 
 typedef struct PEng{
     int count;
@@ -58,7 +56,7 @@ void distributeObjectsToCores(PhysicsEngine* engine, e_epiphany_t* dev){
             e_write(dev,j,k,COMMADDRESS_OBJECTS_COUNT, &value,sizeof(char));
         }
     }
-
+    usleep(20000);
 
 }
 
@@ -154,12 +152,13 @@ int main(){
     printf("%x\n",sizeof(PhysicsObject));
 
     distributeObjectsToCores(&engine,&dev);
-    usleep(20000);
 
-
+    printf("frame->%x\n",sizeof(Frame));
+    char start = 1;
     for(i=0;i<4;i++){
         for(j=0;j<4;j++){
-           //e_load("epiphanyProgram.srec",&dev,i,j,E_TRUE);
+            e_load("epiphanyProgram.srec",&dev,i,j,E_TRUE);
+            e_write(&dev,i,j,COMMADDRESS_READY, &start,sizeof(char));
             usleep(20000);
         }
     }

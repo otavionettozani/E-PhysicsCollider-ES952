@@ -19,6 +19,9 @@
 
 #include "PhysicsObject.h"
 
+#define MAX_ELEMENTS_PER_CORE (4)
+#define CORES (16)
+
 typedef struct DS {
 	float deltaAngVel;
 	Vector deltaVel;
@@ -32,6 +35,7 @@ typedef struct CP{
 } CollisionPair;
 
 //one frame of the current object status
+#define FRAMES_LIMIT (40)
 typedef struct FR{
     char index;
     Point position;

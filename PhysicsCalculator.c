@@ -10,37 +10,37 @@
 
 
 
-State physicsResolution(PhysicsObject*a, PhysicsObject*b, CollisionPair pair){
+void physicsResolution(PhysicsObject*a, PhysicsObject*b, CollisionPair* pair, State* DeltaState){
 	//first we find the impulse in our collision
 	float impulse;
 
 	Point centerA, centerB;
 	worldPosition(&a->rotationCenter, a, &centerA);
 	worldPosition(&b->rotationCenter, b, &centerB);
-	Point RA = pointMake(pair.location.x-centerA.x, pair.location.y-centerA.y);
-	Point RB = pointMake(pair.location.x-centerB.x, pair.location.y-centerB.y);
+	Point RA, RB;
+	e_pointMake(pair->location.x-centerA.x, pair->location.y-centerA.y, &RA);
+	e_pointMake(pair->location.x-centerB.x, pair->location.y-centerB.y, &RB);
 
-	Vector VAP = pointMake(a->linearVelocity.x-a->angularVelocity*RA.y, a->linearVelocity.y+a->angularVelocity*RA.x);
-	Vector VBP = pointMake(b->linearVelocity.x-b->angularVelocity*RB.y, b->linearVelocity.y+b->angularVelocity*RB.x);
-	Vector VAB = pointMake(VAP.x - VBP.x, VAP.y - VBP.y);
+    Vector VAP, VBP, VAB;
+	e_pointMake(a->linearVelocity.x-a->angularVelocity*RA.y, a->linearVelocity.y+a->angularVelocity*RA.x, &VAP);
+	e_pointMake(b->linearVelocity.x-b->angularVelocity*RB.y, b->linearVelocity.y+b->angularVelocity*RB.x, &VBP);
+	e_pointMake(VAP.x - VBP.x, VAP.y - VBP.y, &VAB);
 
-	float crossRANsquare = RA.x*pair.normal.y-pair.normal.x*RA.y;
+	float crossRANsquare = RA.x*pair->normal.y-pair->normal.x*RA.y;
 	crossRANsquare = crossRANsquare*crossRANsquare;
-	float crossRBNsquare = RB.x*pair.normal.y-pair.normal.x*RB.y;
+	float crossRBNsquare = RB.x*pair->normal.y-pair->normal.x*RB.y;
 	crossRBNsquare = crossRBNsquare*crossRBNsquare;
 
 	impulse = a->inverseMass + b->inverseMass + a->inverseInertia*crossRANsquare + b->inverseInertia*crossRBNsquare;
-	impulse = -(1+RESTITUTION_COEFFCIENT)*(VAB.x*pair.normal.x+VAB.y*pair.normal.y)/impulse;
+	impulse = -(1+RESTITUTION_COEFFCIENT)*(VAB.x*pair->normal.x+VAB.y*pair->normal.y)/impulse;
 
+	e_pointMake(impulse*a->inverseMass*pair->normal.x,impulse*a->inverseMass*pair->normal.y, &DeltaState->deltaVel);
+	DeltaState->deltaAngVel = (RA.x*pair->normal.y-RA.y*pair->normal.x)*a->inverseInertia*impulse;
 
-	State DeltaState;
-	DeltaState.deltaVel = pointMake(impulse*a->inverseMass*pair.normal.x,impulse*a->inverseMass*pair.normal.y);
-	DeltaState.deltaAngVel = (RA.x*pair.normal.y-RA.y*pair.normal.x)*a->inverseInertia*impulse;
+	float deltaPosModule = a->inverseMass*pair->depth/(a->inverseMass+b->inverseMass);
+	e_pointMake(deltaPosModule*pair->normal.x, deltaPosModule*pair->normal.y, &DeltaState->deltaPosition);
 
-	float deltaPosModule = a->inverseMass*pair.depth/(a->inverseMass+b->inverseMass);
-	DeltaState.deltaPosition = pointMake(deltaPosModule*pair.normal.x, deltaPosModule*pair.normal.y);
-
-	return DeltaState;
+	return;
 }
 
 char coarseCollision(PhysicsObject*a, PhysicsObject*b){
@@ -308,21 +308,20 @@ void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
 		}
 	}
 
-            state->deltaAngVel = -2;
-            return;
 
 	int currentCollision;
 	//solves the physics part ot the collision for each collision that has happened
 
 	for (currentCollision =0; currentCollision<pairCount; currentCollision++) {
-		State st = physicsResolution(a,b,pairs[currentCollision]);
+		State st;
+		physicsResolution(a, b, &pairs[currentCollision], &st);
 		state->deltaAngVel += st.deltaAngVel;
-		state->deltaPosition=pointMake(st.deltaPosition.x+state->deltaPosition.x, st.deltaPosition.y+state->deltaPosition.y);
-		state->deltaVel=pointMake(st.deltaVel.x+state->deltaVel.x, st.deltaVel.y+state->deltaVel.y);
+		e_pointMake(st.deltaPosition.x+state->deltaPosition.x, st.deltaPosition.y+state->deltaPosition.y, &state->deltaPosition);
+		e_pointMake(st.deltaVel.x+state->deltaVel.x, st.deltaVel.y+state->deltaVel.y, &state->deltaVel);
 	}
-	state->deltaAngVel += a->angularVelocity;
-	state->deltaVel = pointMake(a->linearVelocity.x+state->deltaVel.x, a->linearVelocity.y+state->deltaVel.y);
-	state->deltaPosition = pointMake(a->position.x+state->deltaPosition.x, a->position.y+state->deltaPosition.y);
+	//state->deltaAngVel += a->angularVelocity;
+	//state->deltaVel = pointMake(a->linearVelocity.x+state->deltaVel.x, a->linearVelocity.y+state->deltaVel.y);
+	//state->deltaPosition = pointMake(a->position.x+state->deltaPosition.x, a->position.y+state->deltaPosition.y);
 
 	return;
 }

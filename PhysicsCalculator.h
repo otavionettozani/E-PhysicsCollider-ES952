@@ -27,7 +27,7 @@ typedef struct CP{
 	float depth;
 	Vector normal;
 	Point location;
-}CollisionPair;
+} CollisionPair;
 
 
 /*returns the collision parameters variation for object A

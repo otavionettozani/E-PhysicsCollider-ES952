@@ -15,8 +15,8 @@ int main(void){
     collideObjects(&objects[0],&objects[1], &a);
 
     end[0] = -1;
-    end[1] = a.deltaAngVel;
-    end[2] = 0;
+    end[1] = a.deltaVel.x;
+    end[2] = a.deltaVel.y;
     end[3] = -1;
 
     return EXIT_SUCCESS;

@@ -30,7 +30,7 @@ int main(void){
         frames[i].index = *key +16*i;
         frames[i].rotation = objects[i].rotation+objects[i].angularVelocity*TIMESTEP;
         frames[i].position.x = objects[i].position.x+objects[i].linearVelocity.x*TIMESTEP;
-        frames[i].position.x = objects[i].position.y+objects[i].linearVelocity.y*TIMESTEP;
+        frames[i].position.y = objects[i].position.y+objects[i].linearVelocity.y*TIMESTEP;
 
         for(j=0;j<16;j++){//foreach core
             //get the pointer to objects and count of that core

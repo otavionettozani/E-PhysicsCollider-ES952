@@ -56,8 +56,13 @@ int main(void){
 
 
         //calculating the collisions
+        State state;
         for(i=0; i<*count; i++){ //foreach object inside this core
-            //calculate a timestep
+            state.deltaAngVel = 0;
+            state.deltaPosition.x = 0;
+            state.deltaPosition.y = 0;
+            state.deltaVel.x = 0;
+            state.deltaVel.y = 0;
             int currentFrame = frameCounter*(*count)+i;
             frames[currentFrame].index = *key +16*i;
             for(j=0;j<16;j++){//foreach core
@@ -69,21 +74,31 @@ int main(void){
                     if(*key+16*i == *coreKey+16*k){// if the object is itself
                         continue;
                     }
+
                     //calculate the collision
+                    collideObjects(&objects[i],&coreObjects[k],&state);
                 }
             }
-            frames[currentFrame].rotation = objects[i].rotation;
-            frames[currentFrame].position.y = objects[i].position.y;
-            frames[currentFrame].position.y = objects[i].position.y;
+            frames[currentFrame].rotation = objects[i].position.y;//objects[i].rotation;
+            frames[currentFrame].position.x = state.deltaVel.x;//objects[i].position.x;
+            frames[currentFrame].position.y = state.deltaVel.y;
         }
 
         //synch
+        *halfReady = EndCollision;
+        char synch2 = 1;
+        while(synch2){
+            synch2 = 0;
+            for(i=0;i<CORES;i++){
+                char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
+                if(!*coreReady == EndCollision && !*coreReady == OnVelocity){
+                    synch2 = 1;
+                    break;
+                }
+            }
+        }
     }
-
-    //frames[0].index = -1;
-    //frames[0].rotation = -1;
-    //frames[0].position.x = 2;
-    //frames[0].position.y = 3;
+    //update objects
 
     return EXIT_SUCCESS;
 

@@ -40,7 +40,7 @@ void distributeObjectsToCores(PhysicsEngine* engine, e_epiphany_t* dev){
     k=0;
     for(i=0; i<engine->count; i++){
         int address = COMMADDRESS_OBJECTS+(i/16)*sizeof(PhysicsObject);
-        e_write(dev,j,k,address,&engine->objects[i],sizeof(PhysicsObject));
+        e_write(dev,k,j,address,&engine->objects[i],sizeof(PhysicsObject));
         j = j<3?j+1:0;
         k = j==3?(k<3?k+1:0):k;
     }

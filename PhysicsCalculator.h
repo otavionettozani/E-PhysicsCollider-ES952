@@ -13,7 +13,7 @@
 
 #endif /* PhysicsCalculator_h */
 
-#define RESTITUTION_COEFFCIENT 0.5
+#define RESTITUTION_COEFFCIENT (0.5)
 
 #include "PhysicsObject.h"
 

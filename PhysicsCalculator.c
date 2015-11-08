@@ -226,8 +226,6 @@ void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
 		}
 	}
 
-            state->deltaAngVel = -1;
-            return;
 
 	//third case---------------------------------------------------------------------------
 	/*
@@ -252,11 +250,12 @@ void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
 		worldPosition(&a->format.polygonInfo.points[Abefore],a, &PA1);
 		worldPosition(&a->format.polygonInfo.points[Acurrent],a, &PA2);
 		worldPosition(&a->format.polygonInfo.points[Anext],a, &PA3);
-		Vector A12 = pointMake(PA2.x-PA1.x, PA2.y-PA1.y);
-		Vector A23 = pointMake(PA3.x-PA2.x, PA3.y-PA2.y);
+		Vector A12, A23;
+		e_pointMake(PA2.x-PA1.x, PA2.y-PA1.y, &A12);
+		e_pointMake(PA3.x-PA2.x, PA3.y-PA2.y, &A23);
 
 		pairs[pairCount].depth = 0;
-		pairs[pairCount].normal = pointMake(0, 0);
+		e_pointMake(0, 0, &pairs[pairCount].normal);
 		for (Bcurrent = 0; Bcurrent<b->format.polygonInfo.count; Bcurrent++) {
 			/*for each pair of edge of B, we will find if any of the edges are hitted as shown above*/
 			Bnext = Bcurrent==b->format.polygonInfo.count-1?0:Bcurrent+1;
@@ -265,10 +264,11 @@ void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
 			worldPosition(&b->format.polygonInfo.points[Bbefore], b, &PB1);
 			worldPosition(&b->format.polygonInfo.points[Bcurrent], b, &PB2);
 			worldPosition(&b->format.polygonInfo.points[Bnext], b, &PB3);
-			Vector B12 = pointMake(PB2.x-PB1.x, PB2.y-PB1.y);
-			Vector B23 = pointMake(PB3.x-PB2.x, PB3.y-PB2.y);
-			Vector IA12B23 = pointMake(PB2.x-PA1.x, PB2.y-PA1.y);
-			Vector IA23B12 = pointMake(PB1.x-PA2.x, PB1.y-PA2.y);
+			Vector B12, B23, IA12B23, IA23B12;
+			e_pointMake(PB2.x-PB1.x, PB2.y-PB1.y, &B12);
+			e_pointMake(PB3.x-PB2.x, PB3.y-PB2.y, &B23);
+			e_pointMake(PB2.x-PA1.x, PB2.y-PA1.y, &IA12B23);
+			e_pointMake(PB1.x-PA2.x, PB1.y-PA2.y, &IA23B12);
 
 			float crossB12I = B12.x*IA23B12.y-B12.y*IA23B12.x;
 			float crossB23I = B23.x*IA12B23.y-B23.y*IA12B23.x;
@@ -287,22 +287,29 @@ void collideObjects(PhysicsObject* a, PhysicsObject* b, State* state){
 
 			if(t1>0 && t1<1 && w1>0 && w1<1 && t2>0 && t2<1 && w2>0 && w2<1){
 				//we do have a collision
-				Point collision1 = pointMake((PA1.x+w1*A12.x), (PA1.y+w1*A12.y));
-				Point collision2 = pointMake((PA2.x+w2*A23.x), (PA2.y+w2*A23.y));
-				Vector c12 = pointMake(collision2.x-collision1.x, collision2.y-collision1.y);
+				Point collision1, collision2, c12;
+				e_pointMake((PA1.x+w1*A12.x), (PA1.y+w1*A12.y), &collision1);
+				e_pointMake((PA2.x+w2*A23.x), (PA2.y+w2*A23.y), &collision2);
+				e_pointMake(collision2.x-collision1.x, collision2.y-collision1.y, &c12);
 				Vector normal;
 				rotateVector(&c12, -PI*0.5, &normal); //rotate the edge by -90 degrees, so that it points outside
 				normalizePoint(&normal);
-				Point collisionPoint=pointMake((collision1.x+collision2.x)*0.5, (collision1.y+collision2.y)*0.5);
+				Point collisionPoint;
+				e_pointMake((collision1.x+collision2.x)*0.5, (collision1.y+collision2.y)*0.5, &collisionPoint);
 				float depth = (PA2.x-PB2.x)*normal.x+(PA2.y-PB2.y)*normal.y;
 				depth = -depth;
 				pairs[pairCount].depth = depth;
-				pairs[pairCount].normal = normal;
-				pairs[pairCount].location=collisionPoint;
+				pairs[pairCount].normal.x = normal.x;
+				pairs[pairCount].normal.y = normal.y;
+				pairs[pairCount].location.x=collisionPoint.x;
+				pairs[pairCount].location.y=collisionPoint.y;
 				pairCount++;
 			}
 		}
 	}
+
+            state->deltaAngVel = -2;
+            return;
 
 	int currentCollision;
 	//solves the physics part ot the collision for each collision that has happened

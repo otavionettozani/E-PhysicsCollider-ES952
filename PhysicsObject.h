@@ -14,7 +14,7 @@
 
 #endif /* PhysicsObject_h */
 
-#define PHYSICS_OBJECT_MAXIMUM_POINTS 8
+#define PHYSICS_OBJECT_MAXIMUM_POINTS (8)
 
 //defines the type of the object
 typedef enum objectType{

@@ -13,7 +13,7 @@
 
 #endif /* Math_h */
 
-#define PI 3.14159265359
+#define PI (3.14159265359)
 
 //defines the format of a point
 typedef struct PT{

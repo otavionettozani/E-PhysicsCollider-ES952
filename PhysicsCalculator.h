@@ -15,6 +15,8 @@
 
 #define RESTITUTION_COEFFCIENT (0.5)
 
+#define TIMESTEP (0.04166666)
+
 #include "PhysicsObject.h"
 
 typedef struct DS {
@@ -29,6 +31,12 @@ typedef struct CP{
 	Point location;
 } CollisionPair;
 
+//one frame of the current object status
+typedef struct FR{
+    char index;
+    Point position;
+    float rotation;
+}__attribute__((aligned(8))) Frame;
 
 /*returns the collision parameters variation for object A
  in a collision of both objects A and B, this method

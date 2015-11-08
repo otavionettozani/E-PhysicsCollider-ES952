@@ -16,6 +16,7 @@ typedef struct PEng{
 } PhysicsEngine;
 
 
+
 char addObject(PhysicsEngine* engine, PhysicsObject object){
     if(engine->count == MAX_ELEMENTS_PER_CORE*CORES){
         return 0;
@@ -33,6 +34,32 @@ char minimunCircles(PhysicsEngine* engine){
     for(i=0; i<engine->count; i++){
         calculateMinimumCircle(&engine->objects[i]);
     }
+}
+
+void distributeObjectsToCores(PhysicsEngine* engine, e_epiphany_t* dev){
+    int i, j, k;
+    j=0;
+    k=0;
+    for(i=0; i<engine->count; i++){
+        int address = COMMADDRESS_OBJECTS+(i/16)*sizeof(PhysicsObject);
+        e_write(dev,j,k,address,&engine->objects[i],sizeof(PhysicsObject));
+        j = j<3?j+1:0;
+        k = j==3?(k<3?k+1:0):k;
+    }
+
+    int div = engine->count/16;
+    int res = engine->count%16;
+    for(j=0;j<4;j++){
+        for(k=0;k<4;k++){
+            char key = 4*j+k;
+            char value = div + ((k+4*j)<res);
+            printf("count(%d,%d)->%d %d\n",j,k,value, key);
+            e_write(dev,j,k,COMMADDRESS_CORE_KEY, &key,sizeof(char));
+            e_write(dev,j,k,COMMADDRESS_OBJECTS_COUNT, &value,sizeof(char));
+        }
+    }
+
+
 }
 
 
@@ -126,17 +153,13 @@ int main(){
 
     printf("%x\n",sizeof(PhysicsObject));
 
-    for(i=0;i<4;i++){
-        for(j=0;j<4;j++){
-            e_write(&dev,i,j,COMMADDRESS_OBJECTS,&engine.objects[0],2*sizeof(PhysicsObject));
-            usleep(20000);
-        }
-    }
+    distributeObjectsToCores(&engine,&dev);
+    usleep(20000);
 
 
     for(i=0;i<4;i++){
         for(j=0;j<4;j++){
-            e_load("epiphanyProgram.srec",&dev,i,j,E_TRUE);
+           //e_load("epiphanyProgram.srec",&dev,i,j,E_TRUE);
             usleep(20000);
         }
     }

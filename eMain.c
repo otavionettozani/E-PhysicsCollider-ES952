@@ -4,6 +4,11 @@
 #include "PhysicsCalculator.h"
 #include "e_lib.h"
 
+#define OnVelocity (0)
+#define EndVelocity (1)
+#define OnCollision (2)
+#define EndCollision (3)
+
 int main(void){
 
     //cores memory banks
@@ -19,31 +24,60 @@ int main(void){
     char* halfReady = (char*)COMMADDRESS_HALF_READY;
     char* key = (char*)COMMADDRESS_CORE_KEY;
 
-    int i, j, k;
+    int i, j, k, frameCounter, lastFrame = 0;
     //State a;
     //collideObjects(&objects[0],&objects[1], &a);
 
     while(!*ready);
 
-    for(i=0; i<*count; i++){ //foreach object inside this core
-        //calculate a timestep
-        frames[i].index = *key +16*i;
-        frames[i].rotation = objects[i].rotation+objects[i].angularVelocity*TIMESTEP;
-        frames[i].position.x = objects[i].position.x+objects[i].linearVelocity.x*TIMESTEP;
-        frames[i].position.y = objects[i].position.y+objects[i].linearVelocity.y*TIMESTEP;
+    for(frameCounter=0;frameCounter<FRAMES_PER_STEP; frameCounter++){//for each frame on this iteration
+        *halfReady = OnVelocity;
 
-        for(j=0;j<16;j++){//foreach core
-            //get the pointer to objects and count of that core
-            char* coreCount = (char*)(cores[j] | COMMADDRESS_OBJECTS_COUNT);
-            PhysicsObject* coreObjects =  (PhysicsObject*)(cores[j] | COMMADDRESS_OBJECTS);
-            char* coreKey = (char*)(cores[j] | COMMADDRESS_CORE_KEY);
-            for(k=0;k<*coreCount;k++){ //foreach object at target core
-                if(*key+16*i == *coreKey+16*k){// if the object is itself
-                    continue;
+        for(i=0; i<*count; i++){ //foreach object inside this core
+            //calculate a timestep
+            objects[i].rotation = objects[i].rotation+objects[i].angularVelocity*TIMESTEP;
+            objects[i].position.x = objects[i].position.x+objects[i].linearVelocity.x*TIMESTEP;
+            objects[i].position.y = objects[i].position.y+objects[i].linearVelocity.y*TIMESTEP;
+        }
+        //synch
+        *halfReady = EndVelocity;
+        char synch1 = 1;
+        while(synch1){
+            synch1 = 0;
+            for(i=0;i<CORES;i++){
+                char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
+                if(!*coreReady == EndVelocity && !*coreReady == OnCollision){
+                    synch1 = 1;
+                    break;
                 }
-                //calculate the collision
             }
         }
+        *halfReady = OnCollision;
+
+
+        //calculating the collisions
+        for(i=0; i<*count; i++){ //foreach object inside this core
+            //calculate a timestep
+            int currentFrame = frameCounter*(*count)+i;
+            frames[currentFrame].index = *key +16*i;
+            for(j=0;j<16;j++){//foreach core
+                //get the pointer to objects and count of that core
+                char* coreCount = (char*)(cores[j] | COMMADDRESS_OBJECTS_COUNT);
+                PhysicsObject* coreObjects =  (PhysicsObject*)(cores[j] | COMMADDRESS_OBJECTS);
+                char* coreKey = (char*)(cores[j] | COMMADDRESS_CORE_KEY);
+                for(k=0;k<*coreCount;k++){ //foreach object at target core
+                    if(*key+16*i == *coreKey+16*k){// if the object is itself
+                        continue;
+                    }
+                    //calculate the collision
+                }
+            }
+            frames[currentFrame].rotation = objects[i].rotation;
+            frames[currentFrame].position.y = objects[i].position.y;
+            frames[currentFrame].position.y = objects[i].position.y;
+        }
+
+        //synch
     }
 
     //frames[0].index = -1;

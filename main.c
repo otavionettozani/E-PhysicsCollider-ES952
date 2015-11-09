@@ -120,7 +120,7 @@ int main(){
 	addPointToObject(&obj,pointMake(2,2));
 
 	obj.rotationCenter = pointMake(2,0);
-	obj.position = pointMake(0,0.99);
+	obj.position = pointMake(0.5,0.99);
 	obj.rotation = 0;
 	obj.inverseInertia = 1;
 	obj.inverseMass = 1;
@@ -169,8 +169,8 @@ int main(){
     e_read(&dev,0,0,COMMADDRESS_FRAMES,&frm1,sizeof(Frame));
      e_read(&dev,0,1,COMMADDRESS_FRAMES,&frm2,sizeof(Frame));
 
-    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\n",frm1.velocity.x,frm1.velocity.y,frm1.position.x,frm1.position.y);
-    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\n",frm2.velocity.x,frm2.velocity.y,frm2.position.x,frm2.position.y);
+    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm1.velocity.x,frm1.velocity.y,frm1.position.x,frm1.position.y,frm1.angVelocity);
+    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm2.velocity.x,frm2.velocity.y,frm2.position.x,frm2.position.y,frm2.angVelocity);
 
     gettimeofday(&initTime,NULL);
     gettimeofday(&endTime, NULL);

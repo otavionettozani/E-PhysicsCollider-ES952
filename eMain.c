@@ -24,7 +24,7 @@ int main(void){
     char* halfReady = (char*)COMMADDRESS_HALF_READY;
     char* key = (char*)COMMADDRESS_CORE_KEY;
 
-    int i, j, k, frameCounter, lastFrame = 0;
+    int i, j, k, frameCounter, lastFrame = 0, frameNumber =0;
     //State a;
     //collideObjects(&objects[0],&objects[1], &a);
 
@@ -79,9 +79,13 @@ int main(void){
                     collideObjects(&objects[i],&coreObjects[k],&state);
                 }
             }
-            frames[currentFrame].rotation = objects[i].position.y;//objects[i].rotation;
-            frames[currentFrame].position.x = state.deltaVel.x;//objects[i].position.x;
-            frames[currentFrame].position.y = state.deltaVel.y;
+            frames[currentFrame].rotation = objects[i].rotation;
+            frames[currentFrame].angVelocity = objects[i].angularVelocity + state.deltaAngVel;
+            frames[currentFrame].position.x = objects[i].position.x + state.deltaPosition.x;
+            frames[currentFrame].position.y = objects[i].position.y + state.deltaPosition.y;
+            frames[currentFrame].velocity.x = objects[i].linearVelocity.x + state.deltaVel.x;
+            frames[currentFrame].velocity.y = objects[i].linearVelocity.y + state.deltaVel.y;
+            frames[currentFrame].frameNumber = frameNumber;
         }
 
         //synch
@@ -97,8 +101,17 @@ int main(void){
                 }
             }
         }
+        //update objects
+        for(i=0; i<*count; i++){ //foreach object inside this core
+            int currentFrame = frameCounter*(*count)+i;
+            objects[i].angularVelocity = frames[currentFrame].angVelocity;
+            objects[i].position.x = frames[currentFrame].position.x;
+            objects[i].position.y = frames[currentFrame].position.y;
+            objects[i].linearVelocity.x = frames[currentFrame].velocity.x;
+            objects[i].linearVelocity.y = frames[currentFrame].velocity.y;
+        }
+        frameNumber++;
     }
-    //update objects
 
     return EXIT_SUCCESS;
 

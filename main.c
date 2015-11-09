@@ -163,6 +163,13 @@ int main(){
         }
     }
 
+    usleep(300000);
+
+    Frame frm;
+    e_read(&dev,0,0,COMMADDRESS_FRAMES+sizeof(Frame),&frm,sizeof(Frame));
+
+    printf("Frame---\nposition(%g,%g)\n",frm.position.x,frm.position.y);
+
     gettimeofday(&initTime,NULL);
     gettimeofday(&endTime, NULL);
     long long int TotalTime =endTime.tv_sec*1000+endTime.tv_usec/1000-initTime.tv_usec/1000-initTime.tv_sec*1000;

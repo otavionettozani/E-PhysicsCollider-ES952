@@ -40,7 +40,9 @@ typedef struct FR{
     char index;
     int frameNumber;
     Point position;
+    Vector velocity;
     float rotation;
+    float angVelocity;
 }__attribute__((aligned(8))) Frame;
 
 /*returns the collision parameters variation for object A

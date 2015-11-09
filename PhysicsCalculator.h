@@ -35,7 +35,7 @@ typedef struct CP{
 } CollisionPair;
 
 //one frame of the current object status
-#define FRAMES_PER_STEP (10)
+#define FRAMES_PER_STEP (2)
 typedef struct FR{
     char index;
     int frameNumber;

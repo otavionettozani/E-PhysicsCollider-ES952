@@ -1,4 +1,4 @@
-#define MEMORY_OFFSET (0x6000)
+#define MEMORY_OFFSET (0x6100)
 
 typedef enum {
 	COMMADDRESS_READY = MEMORY_OFFSET,

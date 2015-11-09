@@ -23,6 +23,8 @@ int main(void){
     char* ready = (char*)COMMADDRESS_READY;
     char* halfReady = (char*)COMMADDRESS_HALF_READY;
     char* key = (char*)COMMADDRESS_CORE_KEY;
+    char nextCore = *key == 0x0f?0x00: *key+1;
+    char* nextCoreReady = (char*)(cores[nextCore] | COMMADDRESS_HALF_READY);
 
     int i, j, k, frameCounter, lastFrame = 0, frameNumber =0;
     //State a;
@@ -40,19 +42,26 @@ int main(void){
             objects[i].position.y = objects[i].position.y+objects[i].linearVelocity.y*TIMESTEP;
         }
         //synch
+
         *halfReady = EndVelocity;
         char synch1 = 1;
-        while(synch1){
+        while(synch1){//wait for all cores to be at EndVelocity
             synch1 = 0;
             for(i=0;i<CORES;i++){
                 char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
-                if(!*coreReady == EndVelocity && !*coreReady == OnCollision){
+                if(*coreReady != EndVelocity){
                     synch1 = 1;
                     break;
                 }
             }
+            if(*halfReady == OnCollision){
+                break;
+            }
         }
         *halfReady = OnCollision;
+        if(*nextCoreReady!=OnCollision && *nextCoreReady!=EndCollision ){
+            *nextCoreReady = OnCollision;
+        }
 
 
         //calculating the collisions
@@ -91,16 +100,25 @@ int main(void){
         //synch
         *halfReady = EndCollision;
         char synch2 = 1;
-        while(synch2){
+        while(synch2){//wait for all cores to be at EndVelocity
             synch2 = 0;
             for(i=0;i<CORES;i++){
                 char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
-                if(!*coreReady == EndCollision && !*coreReady == OnVelocity){
+                if(*coreReady != EndCollision){
                     synch2 = 1;
                     break;
                 }
             }
+            if(*halfReady == OnVelocity){
+                break;
+            }
         }
+        *halfReady = OnVelocity;
+        if(*nextCoreReady!=OnVelocity && *nextCoreReady!=EndVelocity ){
+            *nextCoreReady = OnVelocity;
+        }
+
+
         //update objects
         for(i=0; i<*count; i++){ //foreach object inside this core
             int currentFrame = frameCounter*(*count)+i;

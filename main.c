@@ -159,23 +159,34 @@ int main(){
         for(j=0;j<4;j++){
             e_load("epiphanyProgram.srec",&dev,i,j,E_TRUE);
             e_write(&dev,i,j,COMMADDRESS_READY, &start,sizeof(char));
-            usleep(20000);
+            //usleep(20000);
         }
     }
 
-    usleep(3000000);
+    //usleep(3000000);
+    long long int TotalTime;
+    gettimeofday(&initTime,NULL);
 
     Frame frm1, frm2;
-    e_read(&dev,0,0,COMMADDRESS_FRAMES,&frm1,sizeof(Frame));
-     e_read(&dev,0,1,COMMADDRESS_FRAMES,&frm2,sizeof(Frame));
+    while(1){
+        e_read(&dev,0,0,COMMADDRESS_FRAMES,&frm1,sizeof(Frame));
+        e_read(&dev,0,1,COMMADDRESS_FRAMES,&frm2,sizeof(Frame));
 
-    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm1.velocity.x,frm1.velocity.y,frm1.position.x,frm1.position.y,frm1.angVelocity);
-    printf("Frame---\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm2.velocity.x,frm2.velocity.y,frm2.position.x,frm2.position.y,frm2.angVelocity);
+        printf("Frame---%d\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm1.frameNumber,frm1.velocity.x,frm1.velocity.y,frm1.position.x,frm1.position.y,frm1.angVelocity);
+        printf("Frame---%d\nvelocity(%g,%g)\nposition(%g,%g)\nangVel%g\n",frm1.frameNumber,frm2.velocity.x,frm2.velocity.y,frm2.position.x,frm2.position.y,frm2.angVelocity);
+        gettimeofday(&endTime, NULL);
+        TotalTime =endTime.tv_sec*1000+endTime.tv_usec/1000-initTime.tv_usec/1000-initTime.tv_sec*1000;
+        float fps= frm1.frameNumber;
+        fps = fps*1000/(float)TotalTime;
+        printf("FPS=%g\n",fps);
+        if(frm1.frameNumber >=20  && frm2.frameNumber >= 20){
+            break;
+        }
+    }
 
-    gettimeofday(&initTime,NULL);
     gettimeofday(&endTime, NULL);
-    long long int TotalTime =endTime.tv_sec*1000+endTime.tv_usec/1000-initTime.tv_usec/1000-initTime.tv_sec*1000;
-    printf("%lld\n", TotalTime);
+    TotalTime =endTime.tv_sec*1000+endTime.tv_usec/1000-initTime.tv_usec/1000-initTime.tv_sec*1000;
+    printf("TotalTime = %lld\n", TotalTime);
 
     //-------------------------DUMP MEMORY -----------------------------
 	//read all memory

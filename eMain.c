@@ -32,7 +32,7 @@ int main(void){
 
     while(!*ready);
 
-    for(frameCounter=0;frameCounter<FRAMES_PER_STEP; frameCounter++){//for each frame on this iteration
+    while(1){
         *halfReady = OnVelocity;
 
         for(i=0; i<*count; i++){ //foreach object inside this core
@@ -49,6 +49,10 @@ int main(void){
             synch1 = 0;
             for(i=0;i<CORES;i++){
                 char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
+                char* coreCount = (char*)(cores[i] | COMMADDRESS_OBJECTS_COUNT);
+                if(*coreCount ==0){//if core does not have a object, ignore it
+                    continue;
+                }
                 if(*coreReady != EndVelocity){
                     synch1 = 1;
                     break;
@@ -72,7 +76,7 @@ int main(void){
             state.deltaPosition.y = 0;
             state.deltaVel.x = 0;
             state.deltaVel.y = 0;
-            int currentFrame = frameCounter*(*count)+i;
+            int currentFrame = i;//frameCounter*(*count)+i;
             frames[currentFrame].index = *key +16*i;
             for(j=0;j<16;j++){//foreach core
                 //get the pointer to objects and count of that core
@@ -104,6 +108,10 @@ int main(void){
             synch2 = 0;
             for(i=0;i<CORES;i++){
                 char* coreReady = (char*)(cores[i] | COMMADDRESS_HALF_READY);
+                char* coreCount = (char*)(cores[i] | COMMADDRESS_OBJECTS_COUNT);
+                if(*coreCount ==0){//if core does not have a object, ignore it
+                    continue;
+                }
                 if(*coreReady != EndCollision){
                     synch2 = 1;
                     break;
@@ -118,10 +126,9 @@ int main(void){
             *nextCoreReady = OnVelocity;
         }
 
-
         //update objects
         for(i=0; i<*count; i++){ //foreach object inside this core
-            int currentFrame = frameCounter*(*count)+i;
+            int currentFrame = i;//frameCounter*(*count)+i;
             objects[i].angularVelocity = frames[currentFrame].angVelocity;
             objects[i].position.x = frames[currentFrame].position.x;
             objects[i].position.y = frames[currentFrame].position.y;

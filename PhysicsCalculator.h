@@ -15,7 +15,7 @@
 
 #define RESTITUTION_COEFFCIENT (0.5)
 
-#define TIMESTEP (0.04166666)
+#define TIMESTEP (0.54166666)
 
 #include "PhysicsObject.h"
 
@@ -35,7 +35,6 @@ typedef struct CP{
 } CollisionPair;
 
 //one frame of the current object status
-#define FRAMES_PER_STEP (2)
 typedef struct FR{
     char index;
     int frameNumber;
